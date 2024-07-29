@@ -112,6 +112,7 @@ function library.new(titleText)
             BackgroundTransparency = 1,
             Parent = tab
         })
+        tab.CanvasSize = UDim2.new(0, 0, 0, tab.CanvasSize.Y.Offset + 30)
         return label
     end
 
@@ -128,6 +129,7 @@ function library.new(titleText)
             toggled = not toggled
             callback(toggled)
         end)
+        tab.CanvasSize = UDim2.new(0, 0, 0, tab.CanvasSize.Y.Offset + 30)
         return toggle
     end
 
@@ -144,6 +146,7 @@ function library.new(titleText)
                 callback(textbox.Text)
             end
         end)
+        tab.CanvasSize = UDim2.new(0, 0, 0, tab.CanvasSize.Y.Offset + 30)
         return textbox
     end
 
@@ -158,6 +161,7 @@ function library.new(titleText)
         button.MouseButton1Click:Connect(function()
             callback()
         end)
+        tab.CanvasSize = UDim2.new(0, 0, 0, tab.CanvasSize.Y.Offset + 30)
         return button
     end
 
