@@ -51,9 +51,11 @@ function library.new(titleText)
     })
     closeButton.MouseButton1Click:Connect(function() screenGui:Destroy() end)
 
-    local tabBar = createInstance("Frame", {
+    local tabBar = createInstance("ScrollingFrame", {
         Size = UDim2.new(1, 0, 0, 30),
         Position = UDim2.new(0, 0, 0, 30),
+        CanvasSize = UDim2.new(0, 0, 0, 30),
+        ScrollBarThickness = 8,
         BackgroundColor3 = Color3.fromRGB(50, 50, 50),
         Parent = mainFrame
     })
@@ -90,6 +92,10 @@ function library.new(titleText)
 
         table.insert(tabs, tabContentFrame)
         table.insert(tabButtons, tabButton)
+
+        -- Update the tab bar canvas size to accommodate new tabs
+        tabBar.CanvasSize = UDim2.new(0, 100 * #tabs, 0, 30)
+
         return tabContentFrame
     end
 
