@@ -99,23 +99,60 @@ function library.new(titleText)
     end
 
     function lib:addLabel(tab, text)
-        -- Add label to specified tab
-        -- Implementation remains the same
+        local label = createInstance("TextLabel", {
+            Size = UDim2.new(1, 0, 0, 30),
+            Text = text,
+            TextColor3 = Color3.fromRGB(255, 255, 255),
+            BackgroundTransparency = 1,
+            Parent = tab
+        })
+        return label
     end
 
     function lib:addToggle(tab, text, callback)
-        -- Add toggle to specified tab
-        -- Implementation remains the same
+        local toggle = createInstance("TextButton", {
+            Size = UDim2.new(1, 0, 0, 30),
+            Text = text,
+            TextColor3 = Color3.fromRGB(255, 255, 255),
+            BackgroundTransparency = 1,
+            Parent = tab
+        })
+        local toggled = false
+        toggle.MouseButton1Click:Connect(function()
+            toggled = not toggled
+            callback(toggled)
+        end)
+        return toggle
     end
 
     function lib:addTextbox(tab, placeholder, callback)
-        -- Add textbox to specified tab
-        -- Implementation remains the same
+        local textbox = createInstance("TextBox", {
+            Size = UDim2.new(1, 0, 0, 30),
+            PlaceholderText = placeholder,
+            TextColor3 = Color3.fromRGB(255, 255, 255),
+            BackgroundTransparency = 1,
+            Parent = tab
+        })
+        textbox.FocusLost:Connect(function(enterPressed)
+            if enterPressed then
+                callback(textbox.Text)
+            end
+        end)
+        return textbox
     end
 
     function lib:addButton(tab, text, callback)
-        -- Add button to specified tab
-        -- Implementation remains the same
+        local button = createInstance("TextButton", {
+            Size = UDim2.new(1, 0, 0, 30),
+            Text = text,
+            TextColor3 = Color3.fromRGB(255, 255, 255),
+            BackgroundTransparency = 1,
+            Parent = tab
+        })
+        button.MouseButton1Click:Connect(function()
+            callback()
+        end)
+        return button
     end
 
     -- Make the mainFrame draggable
