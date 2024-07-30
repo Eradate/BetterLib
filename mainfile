@@ -9,17 +9,6 @@ local function createInstance(className, properties)
     return instance
 end
 
-local function applyGradient(object)
-    local gradient = createInstance("UIGradient", {
-        Parent = object,
-        Color = ColorSequence.new{
-            ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-            ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 200, 200))
-        }
-    })
-    return gradient
-end
-
 function library.new(titleText)
     local lib = setmetatable({}, library)
     local screenGui = createInstance("ScreenGui", {Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")})
@@ -41,7 +30,6 @@ function library.new(titleText)
         BackgroundColor3 = Color3.fromRGB(50, 50, 50),
         Parent = mainFrame
     })
-    applyGradient(titleBar)
 
     local titleLabel = createInstance("TextLabel", {
         Size = UDim2.new(1, -60, 1, 0),
@@ -71,7 +59,6 @@ function library.new(titleText)
         BackgroundColor3 = Color3.fromRGB(50, 50, 50),
         Parent = mainFrame
     })
-    applyGradient(tabBar)
 
     local tabs = {}
     local tabButtons = {}
@@ -88,6 +75,12 @@ function library.new(titleText)
             Visible = false
         })
 
+        createInstance("UIListLayout", {
+            SortOrder = Enum.SortOrder.LayoutOrder,
+            Padding = UDim.new(0, 5),
+            Parent = tabContentFrame
+        })
+
         local tabButton = createInstance("TextButton", {
             Size = UDim2.new(0, 100, 1, 0),
             Position = UDim2.new(#tabs * 0.3, 0, 0, 0),
@@ -96,8 +89,6 @@ function library.new(titleText)
             BackgroundColor3 = Color3.fromRGB(60, 60, 60),
             Parent = tabBar
         })
-        applyGradient(tabButton)
-
         tabButton.MouseButton1Click:Connect(function()
             for _, tab in pairs(tabs) do
                 tab.Visible = false
@@ -114,38 +105,26 @@ function library.new(titleText)
         return tabContentFrame
     end
 
-    function lib:addLabel(tab, text)
-        local label = createInstance("TextLabel", {
-            Size = UDim2.new(1, 0, 0, 30),
-            Text = text,
-            TextColor3 = Color3.fromRGB(255, 255, 255),
-            BackgroundTransparency = 1,
-            Parent = tab
-        })
-        applyGradient(label)
-
-        tab.CanvasSize = UDim2.new(0, 0, 0, tab.CanvasSize.Y.Offset + 30)
-        return label
-    end
-
-    function lib:addButton(tab, text, callback)
-        local button = createInstance("TextButton", {
-            Size = UDim2.new(1, 0, 0, 30),
-            Text = text,
-            TextColor3 = Color3.fromRGB(255, 255, 255),
-            BackgroundTransparency = 1,
-            Parent = tab
-        })
-        applyGradient(button)
-
-        button.MouseButton1Click:Connect(function()
-            button.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-            wait(0.2)
-            button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-            callback()
+    local function applyHoverEffect(instance)
+        local defaultColor = instance.BackgroundColor3
+        instance.MouseEnter:Connect(function()
+            instance.BackgroundColor3 = Color3.new(defaultColor.r + 0.1, defaultColor.g + 0.1, defaultColor.b + 0.1)
         end)
-        tab.CanvasSize = UDim2.new(0, 0, 0, tab.CanvasSize.Y.Offset + 30)
-        return button
+        instance.MouseLeave:Connect(function()
+            instance.BackgroundColor3 = defaultColor
+        end)
+
+        instance.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.Touch then
+                instance.BackgroundColor3 = Color3.new(defaultColor.r + 0.1, defaultColor.g + 0.1, defaultColor.b + 0.1)
+            end
+        end)
+
+        instance.InputEnded:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.Touch then
+                instance.BackgroundColor3 = defaultColor
+            end
+        end)
     end
 
     function lib:addToggle(tab, text, callback)
@@ -153,18 +132,17 @@ function library.new(titleText)
             Size = UDim2.new(1, 0, 0, 30),
             Text = text,
             TextColor3 = Color3.fromRGB(255, 255, 255),
-            BackgroundTransparency = 1,
+            BackgroundColor3 = Color3.fromRGB(70, 70, 70),
+            BackgroundTransparency = 0,
             Parent = tab
         })
-        applyGradient(toggle)
-
         local toggled = false
         toggle.MouseButton1Click:Connect(function()
             toggled = not toggled
-            toggle.BackgroundColor3 = toggled and Color3.fromRGB(100, 100, 100) or Color3.fromRGB(60, 60, 60)
             callback(toggled)
         end)
-        tab.CanvasSize = UDim2.new(0, 0, 0, tab.CanvasSize.Y.Offset + 30)
+        applyHoverEffect(toggle)
+        tab.CanvasSize = UDim2.new(0, 0, 0, tab.CanvasSize.Y.Offset + 35)
         return toggle
     end
 
@@ -173,18 +151,35 @@ function library.new(titleText)
             Size = UDim2.new(1, 0, 0, 30),
             PlaceholderText = placeholder,
             TextColor3 = Color3.fromRGB(255, 255, 255),
-            BackgroundTransparency = 1,
+            BackgroundColor3 = Color3.fromRGB(70, 70, 70),
+            BackgroundTransparency = 0,
             Parent = tab
         })
-        applyGradient(textbox)
-
         textbox.FocusLost:Connect(function(enterPressed)
             if enterPressed then
                 callback(textbox.Text)
             end
         end)
-        tab.CanvasSize = UDim2.new(0, 0, 0, tab.CanvasSize.Y.Offset + 30)
+        applyHoverEffect(textbox)
+        tab.CanvasSize = UDim2.new(0, 0, 0, tab.CanvasSize.Y.Offset + 35)
         return textbox
+    end
+
+    function lib:addButton(tab, text, callback)
+        local button = createInstance("TextButton", {
+            Size = UDim2.new(1, 0, 0, 30),
+            Text = text,
+            TextColor3 = Color3.fromRGB(255, 255, 255),
+            BackgroundColor3 = Color3.fromRGB(70, 70, 70),
+            BackgroundTransparency = 0,
+            Parent = tab
+        })
+        button.MouseButton1Click:Connect(function()
+            callback()
+        end)
+        applyHoverEffect(button)
+        tab.CanvasSize = UDim2.new(0, 0, 0, tab.CanvasSize.Y.Offset + 35)
+        return button
     end
 
     -- Make the mainFrame draggable
@@ -209,7 +204,7 @@ function library.new(titleText)
     end)
 
     mainFrame.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType.Touch then
             dragInput = input
         end
     end)
