@@ -9,6 +9,17 @@ local function createInstance(className, properties)
     return instance
 end
 
+local function applyGradient(object)
+    local gradient = createInstance("UIGradient", {
+        Parent = object,
+        Color = ColorSequence.new{
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 200, 200))
+        }
+    })
+    return gradient
+end
+
 function library.new(titleText)
     local lib = setmetatable({}, library)
     local screenGui = createInstance("ScreenGui", {Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")})
@@ -30,6 +41,7 @@ function library.new(titleText)
         BackgroundColor3 = Color3.fromRGB(50, 50, 50),
         Parent = mainFrame
     })
+    applyGradient(titleBar)
 
     local titleLabel = createInstance("TextLabel", {
         Size = UDim2.new(1, -60, 1, 0),
@@ -59,6 +71,7 @@ function library.new(titleText)
         BackgroundColor3 = Color3.fromRGB(50, 50, 50),
         Parent = mainFrame
     })
+    applyGradient(tabBar)
 
     local tabs = {}
     local tabButtons = {}
@@ -83,16 +96,14 @@ function library.new(titleText)
             BackgroundColor3 = Color3.fromRGB(60, 60, 60),
             Parent = tabBar
         })
+        applyGradient(tabButton)
+
         tabButton.MouseButton1Click:Connect(function()
             for _, tab in pairs(tabs) do
                 tab.Visible = false
             end
             tabContentFrame.Visible = true
         end)
-
-        local layout = Instance.new("UIListLayout", tabContentFrame)
-        layout.SortOrder = Enum.SortOrder.LayoutOrder
-        layout.Padding = UDim.new(0, 5)
 
         table.insert(tabs, tabContentFrame)
         table.insert(tabButtons, tabButton)
@@ -103,11 +114,6 @@ function library.new(titleText)
         return tabContentFrame
     end
 
-    function lib:addDropdown(tab, options)
-        -- Add dropdown to specified tab
-        -- Implementation remains the same
-    end
-
     function lib:addLabel(tab, text)
         local label = createInstance("TextLabel", {
             Size = UDim2.new(1, 0, 0, 30),
@@ -116,8 +122,30 @@ function library.new(titleText)
             BackgroundTransparency = 1,
             Parent = tab
         })
-        tab.CanvasSize = UDim2.new(0, 0, 0, tab.CanvasSize.Y.Offset + 35)
+        applyGradient(label)
+
+        tab.CanvasSize = UDim2.new(0, 0, 0, tab.CanvasSize.Y.Offset + 30)
         return label
+    end
+
+    function lib:addButton(tab, text, callback)
+        local button = createInstance("TextButton", {
+            Size = UDim2.new(1, 0, 0, 30),
+            Text = text,
+            TextColor3 = Color3.fromRGB(255, 255, 255),
+            BackgroundTransparency = 1,
+            Parent = tab
+        })
+        applyGradient(button)
+
+        button.MouseButton1Click:Connect(function()
+            button.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+            wait(0.2)
+            button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+            callback()
+        end)
+        tab.CanvasSize = UDim2.new(0, 0, 0, tab.CanvasSize.Y.Offset + 30)
+        return button
     end
 
     function lib:addToggle(tab, text, callback)
@@ -128,12 +156,15 @@ function library.new(titleText)
             BackgroundTransparency = 1,
             Parent = tab
         })
+        applyGradient(toggle)
+
         local toggled = false
         toggle.MouseButton1Click:Connect(function()
             toggled = not toggled
+            toggle.BackgroundColor3 = toggled and Color3.fromRGB(100, 100, 100) or Color3.fromRGB(60, 60, 60)
             callback(toggled)
         end)
-        tab.CanvasSize = UDim2.new(0, 0, 0, tab.CanvasSize.Y.Offset + 35)
+        tab.CanvasSize = UDim2.new(0, 0, 0, tab.CanvasSize.Y.Offset + 30)
         return toggle
     end
 
@@ -145,28 +176,15 @@ function library.new(titleText)
             BackgroundTransparency = 1,
             Parent = tab
         })
+        applyGradient(textbox)
+
         textbox.FocusLost:Connect(function(enterPressed)
             if enterPressed then
                 callback(textbox.Text)
             end
         end)
-        tab.CanvasSize = UDim2.new(0, 0, 0, tab.CanvasSize.Y.Offset + 35)
+        tab.CanvasSize = UDim2.new(0, 0, 0, tab.CanvasSize.Y.Offset + 30)
         return textbox
-    end
-
-    function lib:addButton(tab, text, callback)
-        local button = createInstance("TextButton", {
-            Size = UDim2.new(1, 0, 0, 30),
-            Text = text,
-            TextColor3 = Color3.fromRGB(255, 255, 255),
-            BackgroundTransparency = 1,
-            Parent = tab
-        })
-        button.MouseButton1Click:Connect(function()
-            callback()
-        end)
-        tab.CanvasSize = UDim2.new(0, 0, 0, tab.CanvasSize.Y.Offset + 35)
-        return button
     end
 
     -- Make the mainFrame draggable
