@@ -1,32 +1,34 @@
-# Loading the Library
+-- Require the library
+local library = loadstring(game:HttpGet("
 
+-- Name of the libraryl
 ```
-local MyLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/Eradate/BetterLib/main/mainfile"))()
+local ui = library.new("My UI Library")
 ```
-# Name of the library
+-- Adding a tab
 ```
-local lib = MyLibrary.new("My UI Library")
+local featuresTab = ui:addTab("Features")
 ```
-# Tab Name/ Create tabs
+-- Adding a label
 ```
-local tab1 = lib:addTab("Features")
-
-local tab2 = lib:addTab("Settings")
+ui:addLabel(featuresTab, "Welcome to the Features tab!")
 ```
-# Creating Labels
+-- Adding a button
 ```
-lib:addLabel(tab1, "Welcome to the features tab!")
-```
-# Creating Buttons
-```
-lib:addButton(tab1, "Click Me", function() 
-print("Button clicked!") 
+ui:addButton(featuresTab, "Click Me", function()
+    print("Button clicked!")
 end)
 ```
-# Creating Toggles
+-- Adding a toggle button
 ```
-lib:addToggle(tab2, "Enable Feature",
-function(state) 
-print("Feature enabled:", state) 
+ui:addToggle(featuresTab, "Toggle this", function(state)
+    print("Toggle state:", state)
+end)
+```
+
+-- Adding a text box
+```
+ui:addTextbox(featuresTab, "Enter text here...", function(text)
+    print("Textbox input:", text)
 end)
 ```
