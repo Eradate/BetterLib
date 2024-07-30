@@ -1,6 +1,6 @@
 # Require the library
 ```
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Eradate/BetterLib/main/mainfile"))()
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Eradate/BetterLib/main/mainfiles"))()
 ```
 # Library Title
 ```
